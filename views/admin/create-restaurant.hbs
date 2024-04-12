@@ -1,0 +1,10 @@
+<form action="/admin/restaurants" method="POST" enctype="multipart/form-data">
+  {{!-- MDNLinks to an external site. 裡面有提到，如果表單包含 <input type="file"> ，像是我們現在要用表單寫入圖片，會需要特地把格式改成
+  multipart/form-data，才能順利地把圖片一起
+  POST 進去。
+  那透過 <form> 來設定 Content-Type 的時候，會使用的屬性名稱是 enctype --}}
+    <div class="mb-4 text-center">
+      <h1 class="h3 font-weight-normal mb-3">Create Restaurant</h1>
+    </div>
+    {{> admin-restaurant-form}}
+  </form>

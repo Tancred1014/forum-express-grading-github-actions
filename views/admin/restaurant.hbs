@@ -1,0 +1,23 @@
+<div class="row">
+  <div class="col-md-12">
+    <h1>{{restaurant.name}}</h1>
+  </div>
+  <div class="col-md-4">
+    <img class="img-responsive center-block" src="{{restaurant.image}}"
+      style="width: 250px; margin-bottom: 25px; transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
+    <br>
+    {{!-- 由於剛剛有在 model 裡面增加叫 image 的屬性來保存圖片來源的字串，在 view 這邊自然就可以用 restaurant.image 來當作 img 標籤中 src 屬性的值。 --}}
+    <div class="well">
+      <ul class="list-unstyled">
+        <li><strong>Opening Hour:</strong> {{restaurant.openingHours}}</li>
+        <li><strong>Tel:</strong> {{restaurant.tel}}</li>
+        <li><strong>Address:</strong> {{restaurant.address}}</li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <p style="white-space: break-spaces;">{{restaurant.description}}</p>
+  </div>
+  <hr>
+</div>
+<a class="btn btn-outline-secondary" href="javascript:history.back()">Back</a>
