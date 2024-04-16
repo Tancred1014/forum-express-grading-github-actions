@@ -1,4 +1,5 @@
-<h1>餐廳後台</h1>
+{{>admin-tabs route='restaurants'}}
+
 <a href='/admin/restaurants/create'>
   <button type="button" class="btn btn-primary">New Restaurant</button>
 </a>
@@ -33,8 +34,6 @@
         <form action="/admin/restaurants/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
           <button type="submit" class="btn btn-link link-danger"
             onclick="return confirm(`確定要刪除 {{ this.name }} 嗎？`)">Delete</button>
-          {{!-- 使用者點確定 (OK) → confirm() 回傳 true，表單會被提交
-          使用者點取消 (Cancel) → confirm() 回傳 false。形成 onclick="return false"，表單不會被提交。 --}}
         </form>
       </td>
     </tr>
