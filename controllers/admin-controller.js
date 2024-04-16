@@ -1,5 +1,6 @@
 const { Restaurant, User, Category } = require('../models')
 const { localFileHandler } = require('../helpers/file-helpers')
+const category = require('../models/category')
 
 const adminController = {
   getRestaurants: (req, res, next) => {
@@ -11,11 +12,15 @@ const adminController = {
       .then(restaurants => res.render('admin/restaurants', { restaurants }))
       .catch(err => next(err))
   }, // 收到 request 之後，回應一個渲染好的 create-restaurant 樣板 (新增一筆餐廳資料的頁面)。
-  createRestaurant: (req, res) => {
-    return res.render('admin/create-restaurant')
+  createRestaurant: (req, res, next) => {
+    return Category.findAll({
+      raw: true
+    })
+      .then(categories => res.render('admin/create-restaurant', { categories }))
+      .catch(err => next(err))
   },
   postRestaurant: (req, res, next) => {
-    const { name, tel, address, openingHours, description } = req.body
+    const { name, tel, address, openingHours, description, categoryId } = req.body
     if (!name) throw new Error('Restaurant name is required!')
     const { file } = req // 把檔案取出來，也可以寫成 const file = req.file
     localFileHandler(file) // 把取出的檔案傳給 file-helper 處理後
@@ -25,7 +30,8 @@ const adminController = {
         address,
         openingHours,
         description,
-        image: filePath || null
+        image: filePath || null,
+        categoryId
       }))
       .then(() => {
         req.flash('success_messages', 'restaurant was successfully created')
@@ -50,19 +56,20 @@ const adminController = {
     //     找到餐廳之後，再把餐廳資料放在 restaurant 變數裡傳給 view，controller 的工作就完成了。
   },
   editRestaurant: (req, res, next) => {
-    Restaurant.findByPk(req.params.id, {
-      raw: true
-    })
-      .then(restaurant => {
+    return Promise.all([ // 需要同時去「查詢 Restaurants table」 和「查詢 Categories table」，但這兩件事沒有先後順序，不需要互相等待，因此我們就可以用 Promise.all() 裡面的陣列，把這兩個程序都裝進去。查詢都回來以後，才會進入後面的 .then 把資料傳給樣板。
+      Restaurant.findByPk(req.params.id, { raw: true }),
+      Category.findAll({ raw: true })
+    ])
+      .then(([restaurant, categories]) => {
         if (!restaurant) throw new Error("Restaurant didn't exist!")
-        res.render('admin/edit-restaurant', { restaurant })
+        res.render('admin/edit-restaurant', { restaurant, categories })
       })
       .catch(err => next(err))
     // 第一步先反查，先使用 findByPk ，檢查一下有沒有這間餐廳，如果沒有的話，直接拋出錯誤訊息。
     // 如果有的話，就前往 admin / edit - restaurant ，帶使用者到編輯的畫面。
   },
   putRestaurant: (req, res, next) => {
-    const { name, tel, address, openingHours, description } = req.body
+    const { name, tel, address, openingHours, description, categoryId } = req.body
     if (!name) throw new Error('Restaurant name is required!')
     const { file } = req // 把檔案取出來
     Promise.all([ // 非同步處理
@@ -77,7 +84,8 @@ const adminController = {
           address,
           openingHours,
           description,
-          image: filePath || restaurant.image // 如果 filePath 是 Truthy (使用者有上傳新照片) 就用 filePath，是 Falsy (使用者沒有上傳新照片) 就沿用原本資料庫內的值
+          image: filePath || restaurant.image, // 如果 filePath 是 Truthy (使用者有上傳新照片) 就用 filePath，是 Falsy (使用者沒有上傳新照片) 就沿用原本資料庫內的值
+          categoryId
         })
       })
       .then(() => {
