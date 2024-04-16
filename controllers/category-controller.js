@@ -1,10 +1,17 @@
 const { Category } = require('../models')
 const categoryController = {
   getCategories: (req, res, next) => {
-    return Category.findAll({
-      raw: true
-    })
-      .then(categories => res.render('admin/categories', { categories }))
+    return Promise.all([
+      Category.findAll({ raw: true }),
+      req.params.id ? Category.findByPk(req.params.id, { raw: true }) : null
+      // 檢查 req.params.id 這個變數是否存在
+      // 如果存在，在資料庫查詢階段，除了全部類別資料外，還需要撈出這個 id 對應的那一筆資料
+      // 如果不存在，那也不需要 category 變數，直接存成空值即可。
+    ])
+      .then(([categories, category]) => res.render('admin/categories', {
+        categories,
+        category
+      }))
       .catch(err => next(err))
   },
   postCategory: (req, res, next) => {
@@ -14,6 +21,17 @@ const categoryController = {
       .then(() => res.redirect('/admin/categories'))
       .catch(err => next(err))
     // 這個方法先檢查 name 是否為空，如果是空的話就回傳錯誤訊息，否則就建立一個新的分類並且導回瀏覽分類頁面。
+  },
+  putCategory: (req, res, next) => {
+    const { name } = req.body
+    if (!name) throw new Error('Category name is required!')
+    return Category.findByPk(req.params.id)
+      .then(category => {
+        if (!category) throw new Error('Category name is required!')
+        return category.update({ name })
+      })
+      .then(() => res.redirect('/admin/categories'))
+      .catch(err => next(err))
   }
 }
 module.exports = categoryController

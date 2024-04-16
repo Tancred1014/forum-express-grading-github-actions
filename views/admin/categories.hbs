@@ -1,5 +1,16 @@
 {{>admin-tabs route='categories'}}
 <div class="d-flex align-items-center pt-3 pb-5 my-3 text-white-50 bg-purple">
+  {{#if category}}
+  <form class="row" action="/admin/categories/{{category.id}}?_method=PUT" method="POST">
+    <div class="col-auto">
+      <input class="form-control" type="text" placeholder="name" name="name" value="{{category.name}}">
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-warning" type="submit">Update</button>
+      <a class="btn btn-link link-secondary" href="/admin/categories">or Create New</a>
+    </div>
+  </form>
+  {{else}}
   <form class="row" action="/admin/categories" method="POST">
     <div class="col-auto">
       <input class="form-control" type="text" placeholder="Category Name" name="name">
@@ -8,6 +19,11 @@
       <button class="btn btn-success" type="submit">Create</button>
     </div>
   </form>
+  {{/if}}
+  {{!-- 這裡運用 #if category 來判斷 category 變數是否為 Truthy，如果是從「Edit」按鈕發送請求，網址會是 /admin/categories/:id，那在 controller 處理後會準備好
+  category
+  變數，此時 category 就會是 Truthy，那麼樣板就會顯示為上面橘色框中編輯用的版本。
+  這個版本用 value="{{category.name}}" 把原本的值帶入到輸入框裡，使用者修改後按下 Update 按鈕，表單中的資料就會以 PUT 方法提交。 --}}
 </div>
 <table class="table align-middle">
   <thead class="thead-dark">
