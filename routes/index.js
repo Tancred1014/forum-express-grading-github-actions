@@ -17,6 +17,7 @@ router.post('/signup', userController.signUp)
 router.get('/signin', userController.signInPage)
 router.post('/signin', passport.authenticate('local', { failureRedirect: '/signin', failureFlash: true }), userController.signIn) // 注意是 post
 router.get('/logout', userController.logout)
+router.get('/restaurants/:id', authenticated, restController.getRestaurant)
 router.get('/restaurants', authenticated, restController.getRestaurants)
 // 如果一個請求是走 GET /restaurants 進來，會需要先經過 auth.js 這支 middleware 進行身分驗證，通過才能呼叫 restController.getRestaurants 來顯示餐廳清單的主頁
 // 如果接收到的請求路徑是 / restaurants，那就交給 controller 的getRestaurants
