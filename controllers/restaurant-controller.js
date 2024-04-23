@@ -1,4 +1,4 @@
-const { Restaurant, Category } = require('../models')
+const { Restaurant, Category, Comment, User } = require('../models')
 const { getOffset, getPagination } = require('../helpers/pagination-helper')
 
 const restaurantController = {
@@ -56,21 +56,34 @@ const restaurantController = {
   },
   getRestaurant: (req, res, next) => {
     return Restaurant.findByPk(req.params.id, {
-      include: Category, // 拿出關聯的 Category model
+      include: [
+        Category,
+        { model: Comment, include: User }
+      ]
+    })
+      .then(restaurant => {
+        if (!restaurant) throw new Error("Restaurant didn't exist!")
+        return restaurant.increment('viewCount')
+      })
+      .then(restaurant => {
+        res.render('restaurant', {
+          restaurant: restaurant.toJSON()
+        })
+      })
+      .catch(err => next(err))
+  },
+  getDashboard: (req, res, next) => {
+    return Restaurant.findByPk(req.params.id, {
+      include: Category,
       nest: true,
       raw: true
     })
       .then(restaurant => {
         if (!restaurant) throw new Error("Restaurant didn't exist!")
-        res.render('restaurant', {
-          restaurant
-        })
+        res.render('dashboard', { restaurant })
       })
       .catch(err => next(err))
   }
 }
-// 加上負責處理瀏覽餐廳頁面的函式，我們將這個功能命名叫 getRestaurants
-// restaurantController 是一個物件(object)。
-// restaurantController 有不同的方法，例如 getRestaurants ，這個方法目前是負責「瀏覽餐廳頁面」，
-// 也就是去 render 一個叫做 restaurants 的樣板。
+
 module.exports = restaurantController
