@@ -19,6 +19,11 @@ router.post('/signup', userController.signUp)
 router.get('/signin', userController.signInPage)
 router.post('/signin', passport.authenticate('local', { failureRedirect: '/signin', failureFlash: true }), userController.signIn) // 注意是 post
 router.get('/logout', userController.logout)
+router.get('/users/:id/edit', authenticated, userController.editUser)
+router.get('/users/:id', authenticated, userController.getUser)
+router.put('/users/:id', authenticated, upload.single('image'), userController.putUser)
+router.get('/restaurants/feeds', authenticated, restController.getFeeds)
+router.get('/restaurants/:id/dashboard', authenticated, restController.getDashboard)
 router.get('/restaurants/:id', authenticated, restController.getRestaurant)
 router.get('/restaurants', authenticated, restController.getRestaurants)
 router.delete('/comments/:id', authenticatedAdmin, commentController.deleteComment)
@@ -26,9 +31,6 @@ router.post('/comments', authenticated, commentController.postComment)
 // 如果一個請求是走 GET /restaurants 進來，會需要先經過 auth.js 這支 middleware 進行身分驗證，通過才能呼叫 restController.getRestaurants 來顯示餐廳清單的主頁
 // 如果接收到的請求路徑是 / restaurants，那就交給 controller 的getRestaurants
 //  函式來處理。如果這行路由和請求匹配成功，以下的 router.get 就不會執行。
-router.get('/users/:id/edit', authenticated, userController.editUser)
-router.get('/users/:id', authenticated, userController.getUser)
-router.put('/users/:id', authenticated, upload.single('image'), userController.putUser)
 router.use('/', (req, res) => res.redirect('/restaurants'))// 設定 fallback 路由
 router.use('/', generalErrorHandler)
 
