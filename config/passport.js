@@ -30,7 +30,9 @@ passport.deserializeUser((id, cb) => {
   return User.findByPk(id, {
     include: [
       { model: Restaurant, as: 'FavoritedRestaurants' },
-      { model: Restaurant, as: 'LikedRestaurants' }
+      { model: Restaurant, as: 'LikedRestaurants' },
+      { model: User, as: 'Followers' },
+      { model: User, as: 'Followings' }
       // 注意在 include 的時候有追加 as: 'FavoritedRestaurants'
       // 這時候我們用 as 來標明我們想要引入的關係，而這個 as 會對應到我們剛剛在 model 裡設定的別名
     ]
