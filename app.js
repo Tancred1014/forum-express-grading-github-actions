@@ -18,6 +18,7 @@ app.engine('hbs', handlebars({ extname: '.hbs', helpers: handlebarsHelpers }))
 // 設定使用 Handlebars 做為樣板引擎
 app.set('view engine', 'hbs')
 app.use(express.urlencoded({ extended: true }))// body-parser
+app.use(express.json())
 app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }))
 app.use(passport.initialize()) // 初始化 Passport
 app.use(passport.session()) // 啟動 session 功能
