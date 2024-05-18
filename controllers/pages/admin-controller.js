@@ -1,6 +1,6 @@
 const adminServices = require('../../services/admin-services')
 const { Restaurant, User, Category } = require('../../models')
-const { session } = require('passport')
+const { localFileHandler } = require('../../helpers/file-helpers')
 
 const adminController = {
   getRestaurants: (req, res, next) => {
