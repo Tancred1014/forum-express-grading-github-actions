@@ -1,5 +1,6 @@
 const adminServices = require('../../services/admin-services')
 const { Restaurant, User, Category } = require('../../models')
+const { session } = require('passport')
 
 const adminController = {
   getRestaurants: (req, res, next) => {
@@ -91,17 +92,12 @@ const adminController = {
     // 我們在最開頭一樣有做 name 欄位的必填驗證。
     // 透過 Restaurant.findByPk(req.params.id) 把對應的該筆餐廳資料查出來，如果有成功查到，就透過 restaurant.update 來更新資料。
   },
-  deleteRestaurant: (req, res, next) => { // 新增以下
-    return Restaurant.findByPk(req.params.id)
-      .then(restaurant => {
-        if (!restaurant) throw new Error("Restaurant didn't exist!")
-        return restaurant.destroy()
-      })
-      .then(() => res.redirect('/admin/restaurants'))
-      .catch(err => next(err))
-    //   一樣我們先 findByPk ，找找看有沒有這間餐廳。
-    // 如果沒找到就拋出錯誤並結束。如果有就呼叫 sequelize 提供的 destroy() 方法來刪除這筆資料。注意刪除的時候也不會加 { raw: true } 參數。
-    // 呼叫完沒問題的話，就回到後台首頁。
+  deleteRestaurant: (req, res, next) => {
+    adminServices.deleteRestaurant(req, (err, data) => {
+      if (err) return next(err)
+      req.session.deletedData = data
+      return res.redirect('/admin/restaurants')
+    })
   },
   getUsers: (req, res, next) => {
     return User.findAll({
